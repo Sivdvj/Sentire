@@ -4,6 +4,10 @@ export class DB {
 	async getUserByUsername(username) {}
 	async createSession(userId, userAgent) {}
 	async getSession(sid) {}
+	async getMyCode(id) {}
+	async getUserByFriendCode(code) {}
+	async pairUsers(user1, user2) {}
+	async getFriends(userId) {}
 	async saveEmotion(userId, emotionId, emotion, color) {}
 	async getEmotions(userId) {}
 	async logout(userId, token) {}

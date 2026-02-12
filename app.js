@@ -133,6 +133,35 @@ app.post("/revokeAll", async (req, res) => {
 	res.json({ ok: true });
 });
 
+app.post("/friend/pair", async (req, res) => {
+	try {
+		let { code } = req.body;
+		let targetUser = await db.getUserByFriendCode(code);
+		if (!targetUser) {
+			throw new Error("Invalid Friend Code");
+		}
+		console.log(targetUser);
+		await db.pairUsers(targetUser.id, req.userID);
+		res.json({ ok: true });
+	} catch (err) {
+		console.log(err);
+		res.status(401).json({ error: err.message });
+	}
+});
+
+app.post("/friend/getAll", async (req, res) => {
+	let list = await db.getFriends(req.userID);
+	res.json({ ok: true, list });
+});
+
+app.post("/mycode", async (req, res) => {
+	let code = await db.getMyCode(req.userID);
+	if (!code) {
+		return res.status(400).json({ error: "Username does not exist" });
+	}
+	res.json({ ok: true, code });
+});
+
 app.listen(port, () => {
 	console.log(`Listening on port ${port}`);
 });

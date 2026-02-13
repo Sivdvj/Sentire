@@ -87,6 +87,13 @@ app.post("/save", async (req, res) => {
 	res.json({ ok: true });
 });
 
+app.post("/share", async (req, res) => {
+	let { Id, emo, color, viewers } = req.body;
+	//TODO: check if viewers are friends of users
+	await db.shareEmotion(req.userID, Id, emo, color, viewers);
+	res.json({ ok: true });
+});
+
 app.post("/data", async (req, res) => {
 	let rows = await db.getEmotions(req.userID);
 	let emotions = {};
@@ -150,7 +157,7 @@ app.post("/friend/pair", async (req, res) => {
 });
 
 app.post("/friend/getAll", async (req, res) => {
-	let list = await db.getFriends(req.userID);
+	let list = await db.getFriendsWithEmotions(req.userID);
 	res.json({ ok: true, list });
 });
 

@@ -18,6 +18,7 @@ export class MongoDB extends DB {
 		await this.db.collection("sessions").createIndex({ session_id: 1 }, { unique: true });
 		await this.db.collection("users").createIndex({ friendCode: 1 }, { unique: true });
 		await this.db.collection("friendships").createIndex({ user1: 1, user2: 1 }, { unique: true });
+		await this.db.collection("shared").createIndex({ user_id: 1, viewer_id: 1 }, { unique: true });
 	}
 
 	async getMyCode(userID) {
@@ -76,35 +77,85 @@ export class MongoDB extends DB {
 		[user1, user2] = [user1, user2].sort();
 
 		let existing = await this.db.collection("friendships").findOne({ user1, user2 });
-		if (existing) return;
+		if (existing) throw new Error("Already Friends");
 
 		await this.db.collection("friendships").insertOne({ user1, user2, created_at: new Date() });
 	}
 
 	async saveEmotion(userId, emotionId, emotion, color) {
-		await this.db.collection("emotions").insertOne({
+		let result = await this.db.collection("emotions").insertOne({
 			user_id: userId,
 			emotion_id: emotionId,
 			emotion,
 			color,
 		});
+
+		return result.insertedId.toString();
 	}
 
-	async getFriends(userId) {
+	async shareEmotion(userId, emotionId, emotion, color, viewers) {
+		await this.saveEmotion(userId, emotionId, emotion, color);
+		for (let v of viewers) {
+			await this.db.collection("shared").updateOne(
+				{
+					user_id: userId,
+					viewer_id: v,
+				},
+				{
+					$set: {
+						emotion,
+						color,
+						created_at: new Date(),
+					},
+				},
+				{ upsert: true },
+			);
+		}
+	}
+
+	async getFriendsWithEmotions(userId) {
 		let friends = await this.db
 			.collection("friendships")
 			.find({
 				$or: [{ user1: userId }, { user2: userId }],
 			})
 			.toArray();
-		let ids = friends.map((r) => (r.user1 == userId ? r.user2 : r.user1)).map((id) => new ObjectId(id));
+		let ids = friends.map((r) => (r.user1 == userId ? r.user2 : r.user1));
 
+		let objectIds = ids.map((id) => new ObjectId(id));
 		let users = await this.db
 			.collection("users")
-			.find({ _id: { $in: ids } })
+			.find({ _id: { $in: objectIds } }, { projection: { name: 1 } })
 			.toArray();
 
-		return users.map((u) => ({ id: u._id.toString(), name: u.name }));
+		console.log(ids);
+		let sharedEmotions = await this.db
+			.collection("shared")
+			.find({
+				viewer_id: userId,
+				user_id: { $in: ids },
+			})
+			.toArray();
+		let emotionMap = {};
+		for (let e of sharedEmotions) {
+			emotionMap[e.user_id] = e;
+		}
+
+		return users.map((u) => {
+			let emotionData = emotionMap[u._id.toString()];
+
+			return {
+				id: u._id.toString(),
+				name: u.name,
+				currentEmotion: emotionData
+					? {
+							text: emotionData.emotion,
+							color: emotionData.color,
+							createdAt: emotionData.created_at,
+						}
+					: null,
+			};
+		});
 	}
 
 	async getEmotions(userId) {

@@ -52,9 +52,9 @@
 				>
 					<p>Save</p>
 				</button>
-				<div class="flex items-center justify-center rounded-full text-yellow-100" style="background-color:{localStorage.getItem('Color')}">
+				<button class="flex cursor-pointer items-center justify-center rounded-full text-yellow-100" style="background-color:{localStorage.getItem('Color')}" on:click={() => goto("friendSelection")}>
 					<Icon icon="fluent:people-48-regular" showCircle={false} size={10} />
-				</div>
+				</button>
 			</div>
 		</div>
 	</div>

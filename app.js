@@ -81,16 +81,24 @@ app.use(async (req, res, next) => {
 });
 
 app.post("/save", async (req, res) => {
-	let { Id, emo, color } = req.body;
+	let { Id, emo, color, text, act } = req.body;
 
-	await db.saveEmotion(req.userID, Id, emo, color);
+	if (text && text.trim().split(/\s+/).length > 160) {
+		return res.status(400).json({ error: "Description exceeds 160 words" });
+	}
+
+	await db.saveEmotion(req.userID, Id, emo, color, text, act);
 	res.json({ ok: true });
 });
 
 app.post("/share", async (req, res) => {
-	let { Id, emo, color, viewers } = req.body;
+	let { Id, emo, color, text, act, viewers } = req.body;
+
+	if (text && text.trim().split(/\s+/).length > 160) {
+		return res.status(400).json({ error: "Description exceeds 160 words" });
+	}
 	//TODO: check if viewers are friends of users
-	await db.shareEmotion(req.userID, Id, emo, color, viewers);
+	await db.shareEmotion(req.userID, Id, emo, color, text, act, viewers);
 	res.json({ ok: true });
 });
 

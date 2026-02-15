@@ -46,7 +46,10 @@
 						let emo = localStorage.getItem("Emotion");
 						let color = localStorage.getItem("Color");
 						let Id = localStorage.getItem("currID");
-						await request("/save", { Id, emo, color });
+						let text = localStorage.getItem("Feeling");
+						let act = localStorage.getItem("Activity");
+						await request("/save", { Id, emo, color, text, act });
+						localStorage.clear();
 						goto("screen7");
 					}}
 				>

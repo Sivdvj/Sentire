@@ -82,19 +82,21 @@ export class MongoDB extends DB {
 		await this.db.collection("friendships").insertOne({ user1, user2, created_at: new Date() });
 	}
 
-	async saveEmotion(userId, emotionId, emotion, color) {
+	async saveEmotion(userId, emotionId, emotion, color, text, act) {
 		let result = await this.db.collection("emotions").insertOne({
 			user_id: userId,
 			emotion_id: emotionId,
 			emotion,
 			color,
+			text,
+			activity: act,
 		});
 
 		return result.insertedId.toString();
 	}
 
-	async shareEmotion(userId, emotionId, emotion, color, viewers) {
-		await this.saveEmotion(userId, emotionId, emotion, color);
+	async shareEmotion(userId, emotionId, emotion, color, text, act, viewers) {
+		await this.saveEmotion(userId, emotionId, emotion, color, text, act);
 		for (let v of viewers) {
 			await this.db.collection("shared").updateOne(
 				{
@@ -151,6 +153,8 @@ export class MongoDB extends DB {
 					? {
 							text: emotionData.emotion,
 							color: emotionData.color,
+							feeling: emotionData.text,
+							activity: emotionData.activity,
 							createdAt: emotionData.created_at,
 						}
 					: null,

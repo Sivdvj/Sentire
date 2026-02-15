@@ -4,7 +4,7 @@
 	import FriendComponents from "../../lib/FriendScreen.svelte";
 	import Navigation from "../../lib/Navigation.svelte";
 	import { request } from "../../lib/Auth";
-
+	import ThreeParticles from "../../lib/ThreeParticles.svelte";
 	export let goto;
 	let showDropdown = false;
 	let showMyCode = false;
@@ -20,8 +20,11 @@
 </script>
 
 <div class="scrollbar-hide mt-10 h-full w-full space-y-10 overflow-y-auto scroll-smooth p-4">
-	<div class="flex flex-row items-center justify-between">
-		<p class="font-serif text-4xl font-bold text-white">Friends</p>
+	<div class="pointer-events-none absolute inset-0 z-0 opacity-60 blur-md">
+		<ThreeParticles colorParticles={"#68A0B0"} />
+	</div>
+	<div class="relative z-10 flex flex-row items-center justify-between">
+		<p class="px-4 font-serif text-4xl font-bold text-white">Friends</p>
 		<button class="flex cursor-pointer flex-col items-center justify-between text-white" onclick={() => (showDropdown = true)}>
 			<Icons icon="tabler:plus" size={10} showCircle={false} />
 		</button>

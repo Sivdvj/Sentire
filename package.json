@@ -1,23 +1,8 @@
 {
-  "name": "how-we-feel",
-  "version": "1.0.0",
-  "description": "A full-stack web application for tracking, storing, and managing user emotions securely over time.",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "frontend": "cd frontend && npm run dev",
-    "backend": "cd backend && nodemon app.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Sivdvj/how-we-feel.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
-  "bugs": {
-    "url": "https://github.com/Sivdvj/how-we-feel/issues"
-  },
-  "homepage": "https://github.com/Sivdvj/how-we-feel#readme"
+    "name": "how-we-feel",
+    "private": true,
+    "scripts": {
+      "frontend": "cd frontend && npm run dev",
+      "backend": "cd backend && npm run dev"
+   }
 }

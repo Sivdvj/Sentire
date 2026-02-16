@@ -1,40 +1,23 @@
 {
-	"name": "how-we-feel",
-	"private": true,
-	"version": "0.0.0",
-	"type": "module",
-	"scripts": {
-		"dev": "vite",
-		"prod": "vite --host",
-		"build": "vite build",
-		"preview": "vite preview",
-		"format": "prettier --write .",
-		"lint": "prettier --check ."
-	},
-	"devDependencies": {
-		"@iconify/svelte": "^5.0.2",
-		"@sveltejs/vite-plugin-svelte": "^6.2.1",
-		"autoprefixer": "^10.4.21",
-		"postcss": "^8.5.6",
-		"prettier": "^3.7.4",
-		"prettier-plugin-svelte": "^3.4.0",
-		"prettier-plugin-tailwindcss": "^0.7.2",
-		"svelte": "^5.39.6",
-		"vite": "^7.1.7"
-	},
-	"dependencies": {
-		"@iconify-svelte/material-symbols-light": "^1.0.3",
-		"@tailwindcss/vite": "^4.1.14",
-		"@types/three": "^0.180.0",
-		"bcryptjs": "^3.0.3",
-		"cookie-parser": "^1.4.7",
-		"cors": "^2.8.5",
-		"dotenv": "^17.2.3",
-		"express": "^5.2.1",
-		"mongodb": "^7.1.0",
-		"pg": "^8.16.3",
-		"simplex-noise": "^4.0.3",
-		"tailwindcss": "^4.1.14",
-		"three": "^0.180.0"
-	}
+  "name": "how-we-feel",
+  "version": "1.0.0",
+  "description": "A full-stack web application for tracking, storing, and managing user emotions securely over time.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "frontend": "cd frontend && npm run dev",
+    "backend": "cd backend && nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sivdvj/how-we-feel.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Sivdvj/how-we-feel/issues"
+  },
+  "homepage": "https://github.com/Sivdvj/how-we-feel#readme"
 }

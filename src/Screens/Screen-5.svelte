@@ -8,7 +8,7 @@
 
 	function handleInput(e) {
 		const words = e.target.value.trim().split(/\s+/);
-		if (words.length > 10) {
+		if (words.length > 160) {
 			if (e.inputType !== "deleteContentBackward" && e.inputType !== "deleteContentForward") {
 				message = words.slice(0, 160).join(" ");
 			}

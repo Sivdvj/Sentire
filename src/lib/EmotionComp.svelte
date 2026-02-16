@@ -3,6 +3,8 @@
 	import Ecomp1 from "./Ecomp1.svelte";
 	import { request } from "./Auth";
 
+	export let goto;
+
 	let data = {};
 	onMount(async () => {
 		data = await request("/data");
@@ -26,7 +28,7 @@
 	<div class="flex flex-col-reverse">
 		{console.log(data)}
 		{#each Object.entries(data) as [id, userdata]}
-			<Ecomp1 color={userdata.color} text={userdata.emotion} image={getImage(userdata.color)} />
+			<Ecomp1 color={userdata.color} text={userdata.emotion} image={getImage(userdata.color)} fullData={userdata} {goto} />
 		{/each}
 	</div>
 </main>

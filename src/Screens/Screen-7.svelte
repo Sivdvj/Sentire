@@ -8,7 +8,7 @@
 	<button class="flex w-full justify-center text-3xl text-white opacity-80" on:click={() => goto("screen1")}>
 		<Icons icon="material-symbols-light:family-home-outline-rounded" size={20} width={20} height={20} showCircle={false} />
 	</button>
-	<Ecomp />
+	<Ecomp {goto} />
 </div>
 
 <style>

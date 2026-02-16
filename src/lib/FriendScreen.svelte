@@ -10,6 +10,8 @@
 		friends = res.list;
 	});
 
+	export let goto;
+
 	function getImage(color) {
 		const hex = color.replace("#", "");
 		const r = parseInt(hex.substring(0, 2), 16);
@@ -26,7 +28,7 @@
 <main>
 	<div class="flex flex-col gap-4 p-4">
 		{#each friends as friend}
-			<FriendComp name={friend.name} text={friend.currentEmotion?.text || ""} color={friend.currentEmotion?.color || "#ffffff"} image={friend.currentEmotion ? getImage(friend.currentEmotion.color) : ""} />
+			<FriendComp name={friend.name} emotion={friend.currentEmotion?.emotion || ""} color={friend.currentEmotion?.color || "#ffffff"} image={friend.currentEmotion ? getImage(friend.currentEmotion.color) : ""} fullData={friend.currentEmotion} {goto} />
 		{/each}
 	</div>
 </main>

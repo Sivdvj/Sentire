@@ -102,7 +102,7 @@
 		</div>
 	{/if}
 
-	<FriendComponents />
+	<FriendComponents {goto} />
 	<button class="flex w-full cursor-pointer flex-col items-center justify-between" onclick={() => (showDropdown = true)}>
 		<div class="hidden h-15 w-15"></div>
 		<Icons icon="tabler:plus" size={15} fill={"white"} />

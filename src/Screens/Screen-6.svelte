@@ -47,7 +47,7 @@
 						let color = localStorage.getItem("Color");
 						let Id = localStorage.getItem("currID");
 						let text = localStorage.getItem("Feeling");
-						let act = localStorage.getItem("Activity");
+						let act = JSON.parse(localStorage.getItem("Activity"));
 						await request("/save", { Id, emo, color, text, act });
 						localStorage.clear();
 						goto("screen7");

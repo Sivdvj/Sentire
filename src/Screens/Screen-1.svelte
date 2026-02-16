@@ -10,7 +10,7 @@
 		<Checkin {goto} />
 	</div>
 	<div class="mb-20">
-		<Ecomp />
+		<Ecomp {goto} />
 	</div>
 </div>
 <div class="fixed right-0 bottom-0 left-0 z-10 h-24 w-full bg-gradient-to-t from-black/95 from-60% to-transparent to-100% md:absolute">

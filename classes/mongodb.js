@@ -107,6 +107,8 @@ export class MongoDB extends DB {
 					$set: {
 						emotion,
 						color,
+						text,
+						activity: act,
 						created_at: new Date(),
 					},
 				},
@@ -151,9 +153,9 @@ export class MongoDB extends DB {
 				name: u.name,
 				currentEmotion: emotionData
 					? {
-							text: emotionData.emotion,
+							emotion: emotionData.emotion,
 							color: emotionData.color,
-							feeling: emotionData.text,
+							text: emotionData.text,
 							activity: emotionData.activity,
 							createdAt: emotionData.created_at,
 						}

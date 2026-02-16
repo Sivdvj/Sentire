@@ -110,6 +110,8 @@ app.post("/data", async (req, res) => {
 		emotions[row.emotion_id] = {
 			emotion: row.emotion,
 			color: row.color,
+			text: row.text,
+			activity: row.activity,
 		};
 		max_id = Math.max(max_id, row.emotion_id);
 	});
@@ -166,6 +168,7 @@ app.post("/friend/pair", async (req, res) => {
 
 app.post("/friend/getAll", async (req, res) => {
 	let list = await db.getFriendsWithEmotions(req.userID);
+	console.log(list);
 	res.json({ ok: true, list });
 });
 

@@ -32,14 +32,17 @@
 
 	async function handleShare() {
 		let Id = localStorage.getItem("currID");
-
+		let text = localStorage.getItem("Feeling");
+		let act = JSON.parse(localStorage.getItem("Activity"));
 		await request("/share", {
 			Id,
 			emo,
 			color,
+			text,
+			act,
 			viewers: selectedFriends,
 		});
-
+		localStorage.clear();
 		goto("screen7");
 	}
 </script>
@@ -50,7 +53,7 @@
 	</div>
 	<div class="relative z-10 px-4 pt-10 font-serif text-4xl font-bold text-white">Share with Friends</div>
 	<div class="mb-6">
-		<Ecomp1 text={emo} {color} image={getImage(color)} />
+		<Ecomp1 text={emo} {color} image={getImage(color)} {goto} />
 	</div>
 
 	<div class="relative z-10 mb-4 flex flex-1 flex-col overflow-hidden">

@@ -2,8 +2,8 @@ services:
   mongodb:
     image: mongo:7
     container_name: mongodb
-    ports:
-      - "27017:27017"
+    # ports:
+    #   - "27017:27017"
     volumes:
       - mongo_data:/data/db
     restart: unless-stopped
@@ -15,18 +15,20 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
-    ports:
-      - "5432:5432"
+    # ports:
+    #   - "5432:5432"
     volumes:
       - pg_data:/var/lib/postgresql
     restart: unless-stopped
   backend:
     build: ./backend
     container_name: backend
-    ports:
-      - "3000:3000"
+    # ports:
+    #   - "3000:3000"
     env_file:
       - ./backend/.env
+    labels:
+      - "traefik.enable=true"
     depends_on:
       - mongodb
       - postgres
@@ -35,8 +37,10 @@ services:
   frontend:
     build: ./frontend
     container_name: frontend
-    ports:
-      - "80:80"
+    # ports:
+    #   - "80:80"
+    labels:
+      - "traefik.enable=true"
     depends_on:
       - backend
     restart: unless-stopped

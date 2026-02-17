@@ -32,6 +32,14 @@ services:
       - postgres
     restart: unless-stopped
     
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
 volumes:
   mongo_data:
   pg_data:

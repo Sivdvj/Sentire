@@ -20,7 +20,7 @@ Built using **Svelte**, **Node.js (Express)**, and **PostgreSQL, deployed on Azu
 
 ## Architecture Overview
 
-![Architecture](public/architecture.png)
+![Architecture](frontend/public/architecture.png)
 
 ---
 

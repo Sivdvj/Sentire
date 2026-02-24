@@ -27,8 +27,6 @@ services:
     #   - "3000:3000"
     env_file:
       - ./backend/.env
-    labels:
-      - "traefik.enable=true"
     depends_on:
       - mongodb
       - postgres
@@ -37,10 +35,8 @@ services:
   frontend:
     build: ./frontend
     container_name: frontend
-    # ports:
-    #   - "80:80"
-    labels:
-      - "traefik.enable=true"
+    ports:
+      - "80:80"
     depends_on:
       - backend
     restart: unless-stopped

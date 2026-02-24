@@ -37,6 +37,10 @@ services:
     container_name: frontend
     ports:
       - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt/live/sivaranjani.me/fullchain.pem:/etc/ssl/certs/fullchain.pem
+      - /etc/letsencrypt/live/sivaranjani.me/privkey.pem:/etc/ssl/private/privkey.pem
     depends_on:
       - backend
     restart: unless-stopped

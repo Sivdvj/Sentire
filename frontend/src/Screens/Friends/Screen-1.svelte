@@ -21,7 +21,7 @@
 
 <div class="scrollbar-hide mt-10 h-full w-full space-y-10 overflow-y-auto scroll-smooth p-4">
 	<div class="pointer-events-none absolute inset-0 z-0 opacity-60 blur-md">
-		<ThreeParticles colorParticles={"#68A0B0"} />
+		<ThreeParticles colorParticles={"#ffa500"} />
 	</div>
 	<div class="relative z-10 flex flex-row items-center justify-between">
 		<p class="px-4 font-serif text-4xl font-bold text-white">Friends</p>

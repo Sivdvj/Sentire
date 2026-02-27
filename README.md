@@ -20,7 +20,16 @@ Built using **Svelte**, **Node.js (Express)**, and **PostgreSQL, deployed on Azu
 
 ## Architecture Overview
 
-![Architecture](frontend/public/architecture.png)
+![Architecture](design/architecture.png)
+![Architecture](design/architecture2.png)
+
+---
+## Software Design
+
+- **Polymorphic Abstraction**: A class-based database layer allows the app to switch between PostgreSQL and MongoDB via `.env` configuration without changing the API logic.
+- **Layered N-Tier Architecture**: Clean separation between the Presentation (Svelte), Logic (Express Middleware), and Data Abstraction layers.
+- **Low Coupling**: The frontend and backend communicate strictly via a JSON API contract.
+- **Stateful Security**: Unlike stateless JWTs, database-backed sessions allow for Remote Session Revocation.
 
 ---
 

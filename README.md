@@ -45,16 +45,29 @@ Built using **Svelte**, **Node.js (Express)**, and **PostgreSQL, deployed on Azu
 ## Project Structure
 
 ```
-├── public/                  # Static assets
-├── src/
-│   ├── components/  # Reusable UI components
-│   └── Screens/         # Application screens/pages
-├── app.js                   # Express backend
-├── index.html
-├── .env
-├── .gitignore             # Ignore build files and node_modules
-├── Dockerfile
-└── docker-compose.yml
+├── backend/
+│   ├── app.js
+│   ├── classes/ 
+│   ├── Dockerfile
+│   ├── package.json
+│   └── package-lock.json
+├── design/
+│   ├── architecture2.png
+│   └── architecture.png
+├── frontend/
+│   ├── Dockerfile
+│   ├── index.html
+│   ├── jsconfig.json
+│   ├── nginx/
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── public/                 
+│   ├── src/
+│   ├── svelte.config.js
+│   └── vite.config.js
+├── package.json
+├── docker-compose.yml
+└── README.md
 ```
 
 ---

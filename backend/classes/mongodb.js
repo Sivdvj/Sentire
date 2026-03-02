@@ -164,6 +164,44 @@ export class MongoDB extends DB {
 		});
 	}
 
+	async getActivityEmotionAnalytics(userId) {
+		let result = await this.db
+			.collection("emotions")
+			.aggregate([
+				{
+					$match: { user_id: userId },
+				},
+
+				{
+					$group: {
+						_id: {
+							activity: "$activity",
+							emotion: "$emotion",
+							color: "$color",
+						},
+						frequency: { $sum: 1 },
+					},
+				},
+
+				{
+					$project: {
+						_id: 0,
+						activity: "$_id.activity",
+						emotion: "$_id.emotion",
+						color: "$_id.color",
+						frequency: 1,
+					},
+				},
+
+				{
+					$sort: { frequency: -1 },
+				},
+			])
+			.toArray();
+
+		return result;
+	}
+
 	async getEmotions(userId) {
 		return await this.db.collection("emotions").find({ user_id: userId }).sort({ emotion_id: 1 }).toArray();
 	}

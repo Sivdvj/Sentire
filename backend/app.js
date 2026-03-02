@@ -5,11 +5,15 @@ import cookieParser from "cookie-parser";
 import bcrypt from "bcryptjs";
 import { PostgresDB } from "./classes/postgres.js";
 import { MongoDB } from "./classes/mongodb.js";
+import { Neo4jDB } from "./classes/neo4j.js";
 
 let db;
 if (process.env.DATABASE == "postgres") db = new PostgresDB(process.env.POSTGRES_URL);
 else db = new MongoDB(process.env.MONGO_URL);
 await db.connect();
+
+let analytics = new Neo4jDB(process.env.NEO4J_URL);
+await analytics.connect();
 
 const app = express();
 const port = 3000;
@@ -88,6 +92,8 @@ app.post("/save", async (req, res) => {
 	}
 
 	await db.saveEmotion(req.userID, Id, emo, color, text, act);
+	await analytics.saveEmotion(req.userID, Id, emo, color, text, act);
+
 	res.json({ ok: true });
 });
 
@@ -178,6 +184,22 @@ app.post("/mycode", async (req, res) => {
 		return res.status(400).json({ error: "Username does not exist" });
 	}
 	res.json({ ok: true, code });
+});
+
+app.post("/analytics/activity", async (req, res) => {
+	try {
+		let data = await analytics.getActivityEmotionAnalytics(req.userID);
+		res.json({
+			ok: true,
+			data,
+		});
+	} catch (err) {
+		console.error(err);
+
+		res.status(500).json({
+			error: "Failed to load analytics",
+		});
+	}
 });
 
 app.listen(port, () => {

@@ -10,6 +10,7 @@ export class DB {
 	async getFriends(userId) {}
 	async saveEmotion(userId, emotionId, emotion, color) {}
 	async getEmotions(userId) {}
+	async getActivityEmotionAnalytics(userId) {}
 	async logout(userId, token) {}
 	async getSessions(userId, currentToken) {}
 	async revokeSession(userId, token) {}

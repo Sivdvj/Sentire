@@ -2,7 +2,12 @@
     "name": "how-we-feel",
     "private": true,
     "scripts": {
-      "frontend": "cd frontend && npm run dev",
-      "backend": "cd backend && npm run dev"
-   }
+        "frontend": "cd frontend && npm run dev",
+        "backend": "cd backend && npm run dev"
+    },
+    "devDependencies": {
+        "prettier": "^3.8.1",
+        "prettier-plugin-svelte": "^3.5.0",
+        "prettier-plugin-tailwindcss": "^0.7.2"
+    }
 }

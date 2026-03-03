@@ -17,6 +17,23 @@
 	}
 
 	console.log(data);
+
+	let dateStr = "";
+	let timeStr = "";
+
+	if (data.created_at || data.createdAt) {
+		const d = new Date(data.created_at || data.createdAt);
+		const currentYear = new Date().getFullYear();
+		const year = d.getFullYear();
+		/** @type {Intl.DateTimeFormatOptions} */
+		const optDate = { weekday: "long", month: "long", day: "numeric" };
+		if (year !== currentYear) optDate.year = "numeric";
+
+		dateStr = d.toLocaleDateString("en-US", optDate);
+		/** @type {Intl.DateTimeFormatOptions} */
+		const timeFormat = { hour: "numeric", minute: "numeric", hour12: true };
+		timeStr = d.toLocaleTimeString("en-US", timeFormat).toLowerCase();
+	}
 </script>
 
 <!-- TODO: improve ui -->
@@ -24,15 +41,28 @@
 	<div class="pointer-events-none absolute inset-0 z-0 opacity-60 blur-md">
 		<ThreeParticles colorParticles={data.color} />
 	</div>
-	<div class="relative z-10 flex justify-between text-white">
-		<p class="px-4 font-serif text-4xl font-bold">Reflect</p>
-		<button class="cursor-pointer" onclick={() => goto("screen7")}>
-			<Icon icon="material-symbols:close-rounded" showCircle={false} />
-		</button>
+	<div class="relative z-10 flex flex-col space-y-4 text-white">
+		<div class="flex justify-between">
+			<p class="px-4 font-serif text-4xl font-bold">Reflect</p>
+			<button class="cursor-pointer" onclick={() => goto("screen7")}>
+				<Icon icon="material-symbols:close-rounded" showCircle={false} />
+			</button>
+		</div>
+		{#if dateStr}
+			<div class="px-4 text-sm opacity-70">
+				<p>{dateStr} at {timeStr}</p>
+			</div>
+		{/if}
 	</div>
 
 	<div class="relative z-10 flex flex-col items-center justify-center space-y-8 text-center text-white">
 		<div>
+			{#if data.created_at}
+				<p class="mb-4 text-sm opacity-60">
+					{new Date(data.created_at).toLocaleDateString("en-US", { weekday: "short", month: "long", day: "numeric" })}
+					at {new Date(data.created_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "numeric" })}
+				</p>
+			{/if}
 			<h1 class="z-10 mb-2 font-serif text-3xl italic">I felt</h1>
 			<p class="text-3xl font-extrabold" style="color: {data.color}">{data.emotion}</p>
 		</div>

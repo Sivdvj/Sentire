@@ -10,6 +10,10 @@
 	let emo = localStorage.getItem("Emotion");
 	let color = localStorage.getItem("Color");
 
+	let previewData = {
+		created_at: new Date().toISOString(),
+	};
+
 	onMount(async () => {
 		let res = await request("/friend/getAll");
 		if (res.ok) {
@@ -53,7 +57,7 @@
 	</div>
 	<div class="relative z-10 px-4 pt-10 font-serif text-4xl font-bold text-white">Share with Friends</div>
 	<div class="mb-6">
-		<Ecomp1 text={emo} {color} image={getImage(color)} {goto} />
+		<Ecomp1 text={emo} {color} image={getImage(color)} {goto} fullData={previewData} />
 	</div>
 
 	<div class="relative z-10 mb-4 flex flex-1 flex-col overflow-hidden">

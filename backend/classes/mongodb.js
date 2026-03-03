@@ -90,6 +90,7 @@ export class MongoDB extends DB {
 			color,
 			text,
 			activity: act,
+			created_at: new Date(),
 		});
 
 		return result.insertedId.toString();
@@ -138,6 +139,7 @@ export class MongoDB extends DB {
 			.find({
 				viewer_id: userId,
 				user_id: { $in: ids },
+				created_at: { $gt: new Date(Date.now() - 24 * 60 * 60 * 1000) },
 			})
 			.toArray();
 		let emotionMap = {};

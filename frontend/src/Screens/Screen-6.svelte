@@ -2,7 +2,21 @@
 	import { request } from "../lib/Auth";
 	import Icon from "../lib/Icons.svelte";
 	import ThreeParticles from "../lib/ThreeParticles.svelte";
+	import { onMount } from "svelte";
 	export let goto;
+
+	let currentDate = "";
+	let currentTime = "";
+
+	onMount(() => {
+		let now = new Date();
+		/** @type {Intl.DateTimeFormatOptions} */
+		const options = { month: "long", day: "numeric", weekday: "long" };
+		currentDate = now.toLocaleDateString("en-US", options);
+		/** @type {Intl.DateTimeFormatOptions} */
+		let timeOptions = { hour: "numeric", minute: "numeric", hour12: true };
+		currentTime = now.toLocaleTimeString("en-US", timeOptions).toLowerCase();
+	});
 </script>
 
 <div class="relative h-full w-full overflow-hidden p-4">
@@ -22,7 +36,7 @@
 		</div>
 		<div class="grid grid-cols-3 grid-rows-3 gap-2 py-8 text-white">
 			<div class="col-span-3 flex flex-row items-center justify-between rounded-full bg-gray-700/40 p-8">
-				<p>October 23, Thursday<br />12:57 pm</p>
+				<p>{currentDate}<br />{currentTime}</p>
 				<Icon icon="mdi-light:calendar" showCircle={false} />
 			</div>
 			<div class="row-span-2 flex flex-col items-center justify-between rounded-full bg-gray-700/40 p-8 text-center">

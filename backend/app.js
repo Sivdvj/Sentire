@@ -118,6 +118,7 @@ app.post("/data", async (req, res) => {
 			color: row.color,
 			text: row.text,
 			activity: row.activity,
+			created_at: row.created_at,
 		};
 		max_id = Math.max(max_id, row.emotion_id);
 	});

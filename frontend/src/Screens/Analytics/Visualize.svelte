@@ -22,6 +22,44 @@
 
 	let hovered = null;
 	let hoveredActivity = null;
+	let topActivities = [];
+
+	$: if (data.length > 0) {
+		const activityMap = new Map();
+
+		data.forEach((d) => {
+			if (!d.activity) return;
+			if (!activityMap.has(d.activity)) {
+				activityMap.set(d.activity, {
+					name: d.activity,
+					positive: 0,
+					total: 0,
+					breakdown: { Happy: 0, Pleased: 0, Displeased: 0, Sad: 0 },
+				});
+			}
+
+			const stats = activityMap.get(d.activity);
+			const cat = getCategory(d.color);
+
+			stats.total += d.frequency;
+			if (stats.breakdown[cat.label] !== undefined) {
+				stats.breakdown[cat.label] += d.frequency;
+			}
+
+			if (cat.label === "Happy" || cat.label === "Pleased") {
+				stats.positive += d.frequency;
+			}
+		});
+
+		topActivities = Array.from(activityMap.values())
+			.map((a) => ({
+				...a,
+				score: a.total > 0 ? (a.positive / a.total) * 100 : 0,
+			}))
+			.filter((a) => a.total > 0)
+			.sort((a, b) => b.score - a.score)
+			.slice(0, 3);
+	}
 
 	function getCategory(color) {
 		if (!color) return { label: "Unknown", color: "#888888" };
@@ -40,12 +78,9 @@
 		const activityData = data.filter((d) => d.activity === activity);
 		if (activityData.length === 0) return null;
 
-		// 1. Most common mood
 		const sorted = [...activityData].sort((a, b) => b.frequency - a.frequency);
-		// Handle ties? Just take first.
 		const mostCommon = sorted[0]?.emotion || "N/A";
 
-		// 2. Distribution
 		const total = activityData.reduce((sum, d) => sum + d.frequency, 0);
 		const counts = {
 			Happy: 0,
@@ -59,6 +94,10 @@
 			const cat = getCategory(d.color).label;
 			counts[cat] = (counts[cat] || 0) + d.frequency;
 		});
+
+		const positiveCount = counts["Happy"] + counts["Pleased"];
+		const positivePercentage = total > 0 ? Math.round((positiveCount / total) * 100) : 0;
+		const negativePercentage = 100 - positivePercentage;
 
 		const distribution = [
 			{ label: "Happy", count: counts["Happy"], color: "#FFD700" }, // Yellow
@@ -75,6 +114,8 @@
 			mostCommon,
 			distribution,
 			total,
+			positivePercentage,
+			negativePercentage,
 		};
 	}
 
@@ -138,12 +179,10 @@
 	{:else}
 		<div class="scrollbar-hide overflow-x-auto">
 			<div class="flex min-w-max">
-				<!-- Sticky Y-Axis -->
 				<div class="sticky left-0 z-10 bg-[#101010]">
 					<svg width={margin.left} {height} class="font-sans">
 						<g transform="translate({margin.left}, {margin.top})">
 							{#each activities as act, row}
-								<!-- svelte-ignore a11y-mouse-events-have-key-events -->
 								<text x="-10" y={row * cellSize + cellSize / 2} dy="0.35em" text-anchor="end" fill={hoveredActivity?.activity === act ? "white" : "#ddd"} font-weight={hoveredActivity?.activity === act ? "bold" : "normal"} font-size="13" class="cursor-pointer transition-colors duration-200" on:mouseenter={() => (hoveredActivity = getActivityStats(act))} on:mouseleave={() => (hoveredActivity = null)}>
 									{act}
 								</text>
@@ -175,6 +214,30 @@
 				</div>
 			</div>
 		</div>
+
+		{#if topActivities.length > 0}
+			<div class="mt-8 mb-6">
+				<h3 class="mb-4 font-serif text-2xl font-bold text-gray-200">Activities that improve mood</h3>
+				<div class="space-y-3">
+					{#each topActivities as activity, i}
+						<div class="rounded-lg border border-gray-700 bg-gray-800/50 p-3 transition-colors hover:border-yellow-500/30">
+							<div class="mb-2 flex items-center justify-between">
+								<span class="text-lg font-bold text-white">
+									<span class="mr-2 text-gray-500">#{i + 1}</span>{activity.name}
+								</span>
+								<span class="font-mono text-sm font-bold text-green-400">{Math.round(activity.score)}% positive</span>
+							</div>
+							<div class="flex h-2 w-full overflow-hidden rounded-full bg-gray-700">
+								<div style="width: {(activity.breakdown.Happy / activity.total) * 100}%" class="bg-[#FFD700]"></div>
+								<div style="width: {(activity.breakdown.Pleased / activity.total) * 100}%" class="bg-[#32CD32]"></div>
+								<div style="width: {(activity.breakdown.Displeased / activity.total) * 100}%" class="bg-[#FF4500]"></div>
+								<div style="width: {(activity.breakdown.Sad / activity.total) * 100}%" class="bg-[#1E90FF]"></div>
+							</div>
+						</div>
+					{/each}
+				</div>
+			</div>
+		{/if}
 	{/if}
 
 	{#if hovered}
@@ -188,7 +251,15 @@
 		</div>
 	{:else if hoveredActivity}
 		<div class="fixed right-4 bottom-28 left-4 z-50 rounded border border-gray-700 bg-gray-800 p-4 shadow-lg md:right-4 md:left-auto md:w-64">
-			<div class="mb-2 border-b border-gray-700 pb-2 text-lg font-bold text-white">{hoveredActivity.activity}</div>
+			<div class="mb-2 flex justify-between border-b border-gray-700 pb-2 text-lg font-bold text-white">
+				<span>{hoveredActivity.activity}</span>
+			</div>
+
+			<div class="mb-2 flex gap-2 font-mono text-xs tracking-wide uppercase">
+				<span class="text-green-400">{hoveredActivity.positivePercentage}% Pos</span>
+				<span class="text-gray-500">|</span>
+				<span class="text-red-400">{hoveredActivity.negativePercentage}% Neg</span>
+			</div>
 
 			<div class="mb-3">
 				<div class="text-xs tracking-wide text-gray-400 uppercase">Most common mood</div>

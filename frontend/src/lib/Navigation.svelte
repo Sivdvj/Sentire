@@ -19,8 +19,8 @@
 		<Ppl class="h-10 w-10" />
 		<p>Friends</p>
 	</button>
-	<div class="flex flex-col items-center justify-between opacity-60">
+	<button class="flex cursor-pointer flex-col items-center justify-between opacity-60" onclick={() => goto("visual")}>
 		<Data class="h-10 w-10" />
 		<p>Analyze</p>
-	</div>
+	</button>
 </div>

@@ -12,7 +12,7 @@
 	import FriendScreen from "./Screens/Friends/Screen-1.svelte";
 	import FriendSelection from "./Screens/Friends/Selection.svelte";
 	import Reflect from "./Screens/Reflect.svelte";
-
+	import Visual from "./Screens/Analytics/Visualize.svelte";
 	let screen = localStorage.getItem("ScreenName") || "authentication";
 
 	function goto(screenName) {
@@ -49,6 +49,8 @@
 			<FriendSelection {goto} />
 		{:else if screen == "reflect"}
 			<Reflect {goto} />
+		{:else if screen == "visual"}
+			<Visual {goto} />
 		{/if}
 	</div>
 </main>

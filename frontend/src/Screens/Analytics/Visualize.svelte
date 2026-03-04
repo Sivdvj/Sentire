@@ -22,6 +22,7 @@
 
 	let hovered = null;
 	let hoveredActivity = null;
+	let locked = false;
 	let topActivities = [];
 
 	$: if (data.length > 0) {
@@ -167,7 +168,14 @@
 </script>
 
 <!-- TODO: improve UI -->
-<div class="relative h-full w-full overflow-hidden">
+<div
+	class="relative h-full w-full overflow-hidden"
+	onclick={() => {
+		locked = false;
+		hovered = null;
+		hoveredActivity = null;
+	}}
+>
 	<div class="pointer-events-none absolute inset-0 z-0 opacity-60 blur-md">
 		<ThreeParticles colorParticles={"#ffa500"} />
 	</div>
@@ -187,7 +195,36 @@
 						<svg width={margin.left} {height} class="font-sans">
 							<g transform="translate({margin.left}, {margin.top})">
 								{#each activities as act, row}
-									<text x="-10" y={row * cellSize + cellSize / 2} dy="0.35em" text-anchor="end" fill={hoveredActivity?.activity === act ? "white" : "#ddd"} font-weight={hoveredActivity?.activity === act ? "bold" : "normal"} font-size="13" class="cursor-pointer transition-colors duration-200" on:mouseenter={() => (hoveredActivity = getActivityStats(act))} on:mouseleave={() => (hoveredActivity = null)}>
+									<text
+										x="-10"
+										y={row * cellSize + cellSize / 2}
+										dy="0.35em"
+										text-anchor="end"
+										fill={hoveredActivity?.activity === act ? "white" : "#ddd"}
+										font-weight={hoveredActivity?.activity === act ? "bold" : "normal"}
+										font-size="13"
+										class="cursor-pointer transition-colors duration-200"
+										onmouseenter={() => {
+											if (!locked) {
+												hoveredActivity = getActivityStats(act);
+												hovered = null;
+											}
+										}}
+										onmouseleave={() => {
+											if (!locked) hoveredActivity = null;
+										}}
+										onclick={(e) => {
+											e.stopPropagation();
+											if (locked && hoveredActivity?.activity === act) {
+												locked = false;
+												hoveredActivity = null;
+											} else {
+												locked = true;
+												hoveredActivity = getActivityStats(act);
+												hovered = null;
+											}
+										}}
+									>
 										{act}
 									</text>
 								{/each}
@@ -209,7 +246,36 @@
 										{@const cellData = getBubbleData(act, emo)}
 										<circle cx={col * cellSize + cellSize / 2} cy={row * cellSize + cellSize / 2} r="2" fill="#333" />
 										{#if cellData}
-											<circle cx={col * cellSize + cellSize / 2} cy={row * cellSize + cellSize / 2} r={(Math.sqrt(cellData.frequency) / Math.sqrt(maxFreq)) * (cellSize * 0.4)} fill={cellData.color || "white"} opacity={hovered === cellData ? 1 : 0.8} stroke={hovered === cellData ? "white" : "none"} stroke-width="2" class="cursor-pointer transition-all duration-200" on:mouseenter={() => (hovered = cellData)} on:mouseleave={() => (hovered = null)} />
+											<circle
+												cx={col * cellSize + cellSize / 2}
+												cy={row * cellSize + cellSize / 2}
+												r={(Math.sqrt(cellData.frequency) / Math.sqrt(maxFreq)) * (cellSize * 0.4)}
+												fill={cellData.color || "white"}
+												opacity={hovered === cellData ? 1 : 0.8}
+												stroke={hovered === cellData ? "white" : "none"}
+												stroke-width="2"
+												class="cursor-pointer transition-all duration-200"
+												onmouseenter={() => {
+													if (!locked) {
+														hovered = cellData;
+														hoveredActivity = null;
+													}
+												}}
+												onmouseleave={() => {
+													if (!locked) hovered = null;
+												}}
+												onclick={(e) => {
+													e.stopPropagation();
+													if (locked && hovered === cellData) {
+														locked = false;
+														hovered = null;
+													} else {
+														locked = true;
+														hovered = cellData;
+														hoveredActivity = null;
+													}
+												}}
+											/>
 										{/if}
 									{/each}
 								{/each}

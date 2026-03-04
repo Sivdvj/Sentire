@@ -21,6 +21,66 @@
 	const cellSize = 50;
 
 	let hovered = null;
+	let hoveredActivity = null;
+
+	const high_energy_unpleasant = ["angry", "annoyed", "frustrated", "irritated", "furious", "enraged", "outraged", "bitter", "resentful", "hostile", "aggressive", "violent", "impatient", "stressed", "anxious", "panicked", "terrified", "horrified", "disgusted", "repulsed", "nauseated", "appalled", "shocked", "dismayed", "alarmed", "distressed", "troubled", "worried", "uneasy", "restless", "agitated", "jittery", "nervous", "tense", "edgy", "on edge"];
+
+	const high_energy_pleasant = ["happy", "ecstatic", "joyful", "delighted", "thrilled", "excited", "enthusiastic", "euphoric", "elated", "exuberant", "cheerful", "gleeful", "jubilant", "lively", "energetic", "vibrant", "animated", "spirited", "buoyant", "carefree", "lighthearted", "merry", "playful", "fun-loving", "optimistic", "hopeful", "confident", "proud", "accomplished", "triumphant", "victorious", "successful", "admired", "respected", "loved", "adored"];
+
+	const low_energy_unpleasant = ["sad", "depressed", "gloomy", "melancholic", "sorrowful", "mournful", "heartbroken", "desolate", "lonely", "isolated", "abandoned", "rejected", "disappointed", "discouraged", "hopeless", "despairing", "defeated", "weary", "exhausted", "drained", "lethargic", "sluggish", "apathetic", "indifferent", "numb", "detached", "alienated", "bored", "jaded", "unmotivated", "uninspired", "listless", "passive", "submissive", "resigned", "fatigued"];
+
+	const low_energy_pleasant = ["calm", "relaxed", "peaceful", "serene", "tranquil", "content", "satisfied", "fulfilled", "grateful", "appreciative", "loving", "affectionate", "caring", "empathetic", "aware", "patient", "tolerant", "accepting", "forgiving", "merciful", "gentle", "kind", "warm", "nurturing", "supportive", "encouraging", "reassuring", "comforting", "soothing", "mellow", "easygoing", "laid-back", "chill", "composed", "balanced", "harmonious"];
+
+	function getCategory(emotion) {
+		const norm = emotion.toLowerCase().trim();
+		if (high_energy_pleasant.includes(norm)) return { label: "Happy", color: "#FFD700" }; // Yellow/Gold
+		if (low_energy_pleasant.includes(norm)) return { label: "Pleased", color: "#32CD32" }; // LimeGreen
+		if (high_energy_unpleasant.includes(norm)) return { label: "Displeased", color: "#FF4500" }; // OrangeRed
+		if (low_energy_unpleasant.includes(norm)) return { label: "Sad", color: "#1E90FF" }; // DodgerBlue
+		return { label: "Unknown", color: "#888888" };
+	}
+
+	function getActivityStats(activity) {
+		const activityData = data.filter((d) => d.activity === activity);
+		if (activityData.length === 0) return null;
+
+		// 1. Most common mood
+		const sorted = [...activityData].sort((a, b) => b.frequency - a.frequency);
+		// Handle ties? Just take first.
+		const mostCommon = sorted[0]?.emotion || "N/A";
+
+		// 2. Distribution
+		const total = activityData.reduce((sum, d) => sum + d.frequency, 0);
+		const counts = {
+			Happy: 0,
+			Pleased: 0,
+			Displeased: 0,
+			Sad: 0,
+			Unknown: 0,
+		};
+
+		activityData.forEach((d) => {
+			const cat = getCategory(d.emotion).label;
+			counts[cat] = (counts[cat] || 0) + d.frequency;
+		});
+
+		const distribution = [
+			{ label: "Happy", count: counts["Happy"], color: "#FFD700" }, // Yellow
+			{ label: "Pleased", count: counts["Pleased"], color: "#32CD32" }, // Green
+			{ label: "Displeased", count: counts["Displeased"], color: "#FF4500" }, // Red
+			{ label: "Sad", count: counts["Sad"], color: "#1E90FF" }, // Blue
+		].map((item) => ({
+			...item,
+			percentage: total > 0 ? Math.round((item.count / total) * 100) : 0,
+		}));
+
+		return {
+			activity,
+			mostCommon,
+			distribution,
+			total,
+		};
+	}
 
 	onMount(async () => {
 		let res = await request("/analytics/activity");
@@ -87,7 +147,8 @@
 					<svg width={margin.left} {height} class="font-sans">
 						<g transform="translate({margin.left}, {margin.top})">
 							{#each activities as act, row}
-								<text x="-10" y={row * cellSize + cellSize / 2} dy="0.35em" text-anchor="end" fill="#ddd" font-size="13">
+								<!-- svelte-ignore a11y-mouse-events-have-key-events -->
+								<text x="-10" y={row * cellSize + cellSize / 2} dy="0.35em" text-anchor="end" fill={hoveredActivity?.activity === act ? "white" : "#ddd"} font-weight={hoveredActivity?.activity === act ? "bold" : "normal"} font-size="13" class="cursor-pointer transition-colors duration-200" on:mouseenter={() => (hoveredActivity = getActivityStats(act))} on:mouseleave={() => (hoveredActivity = null)}>
 									{act}
 								</text>
 							{/each}
@@ -128,6 +189,28 @@
 				{hovered.emotion}
 			</div>
 			<div class="mt-1 text-xs text-gray-400">Frequency: {hovered.frequency}</div>
+		</div>
+	{:else if hoveredActivity}
+		<div class="fixed right-4 bottom-28 left-4 z-50 rounded border border-gray-700 bg-gray-800 p-4 shadow-lg md:right-4 md:left-auto md:w-64">
+			<div class="mb-2 border-b border-gray-700 pb-2 text-lg font-bold text-white">{hoveredActivity.activity}</div>
+
+			<div class="mb-3">
+				<div class="text-xs tracking-wide text-gray-400 uppercase">Most common mood</div>
+				<div class="text-xl font-semibold text-white capitalize">{hoveredActivity.mostCommon}</div>
+			</div>
+
+			<div>
+				<div class="mb-1 text-xs tracking-wide text-gray-400 uppercase">Distribution</div>
+				{#each hoveredActivity.distribution as item}
+					<div class="flex items-center justify-between py-0.5 text-sm">
+						<div class="flex items-center gap-2">
+							<span class="block h-2.5 w-2.5 rounded-full" style="background-color: {item.color}"></span>
+							<span class="text-gray-300 capitalize">{item.label}</span>
+						</div>
+						<div class="font-mono text-gray-400">{item.count > 0 ? ((item.count / hoveredActivity.total) * 100).toFixed(0) : 0}%</div>
+					</div>
+				{/each}
+			</div>
 		</div>
 	{/if}
 

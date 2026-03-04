@@ -49,20 +49,14 @@
 			</button>
 		</div>
 		{#if dateStr}
-			<div class="px-4 text-sm opacity-70">
-				<p>{dateStr} at {timeStr}</p>
+			<div class="px-4 font-serif text-3xl italic">
+				<p>{dateStr} <br /> {timeStr}</p>
 			</div>
 		{/if}
 	</div>
 
 	<div class="relative z-10 flex flex-col items-center justify-center space-y-8 text-center text-white">
 		<div>
-			{#if data.created_at}
-				<p class="mb-4 text-sm opacity-60">
-					{new Date(data.created_at).toLocaleDateString("en-US", { weekday: "short", month: "long", day: "numeric" })}
-					at {new Date(data.created_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "numeric" })}
-				</p>
-			{/if}
 			<h1 class="z-10 mb-2 font-serif text-3xl italic">I felt</h1>
 			<p class="text-3xl font-extrabold" style="color: {data.color}">{data.emotion}</p>
 		</div>

@@ -68,9 +68,9 @@
 		const g = parseInt(hex.substring(2, 4), 16);
 		const b = parseInt(hex.substring(4, 6), 16);
 
-		if (b > r && b > g * 0.8) return { label: "Sad", color: "#1E90FF" }; // Blue
-		if (g > r && g > b) return { label: "Pleased", color: "#32CD32" }; // Green
-		if (g > r * 0.75) return { label: "Happy", color: "#FFD700" }; // Yellow
+		if (b > r && b > g * 0.8) return { label: "Sad", color: "#90d5ff" }; // Blue
+		if (g > r && g > b) return { label: "Pleased", color: "#83f28f" }; // Green
+		if (g > r * 0.75) return { label: "Happy", color: "#ffda03" }; // Yellow
 		return { label: "Displeased", color: "#FF4500" }; // Red
 	}
 
@@ -100,10 +100,10 @@
 		const negativePercentage = 100 - positivePercentage;
 
 		const distribution = [
-			{ label: "Happy", count: counts["Happy"], color: "#FFD700" }, // Yellow
-			{ label: "Pleased", count: counts["Pleased"], color: "#32CD32" }, // Green
+			{ label: "Happy", count: counts["Happy"], color: "#ffda03" }, // Yellow
+			{ label: "Pleased", count: counts["Pleased"], color: "#83f28f" }, // Green
 			{ label: "Displeased", count: counts["Displeased"], color: "#FF4500" }, // Red
-			{ label: "Sad", count: counts["Sad"], color: "#1E90FF" }, // Blue
+			{ label: "Sad", count: counts["Sad"], color: "#90d5ff" }, // Blue
 		].map((item) => ({
 			...item,
 			percentage: total > 0 ? Math.round((item.count / total) * 100) : 0,
@@ -167,7 +167,7 @@
 </script>
 
 <!-- TODO: improve UI -->
-<div class="scrollbar-hide h-full w-full overflow-y-auto scroll-smooth bg-[#101010] p-4 pb-32 text-white">
+<div class="scrollbar-hide h-full w-full overflow-y-auto scroll-smooth p-4 pb-32 text-white">
 	<h2 class="mb-4 font-serif text-4xl font-bold">Activity & Emotion</h2>
 
 	{#if loading}
@@ -179,7 +179,7 @@
 	{:else}
 		<div class="scrollbar-hide overflow-x-auto">
 			<div class="flex min-w-max">
-				<div class="sticky left-0 z-10 bg-[#101010]">
+				<div class="sticky left-0 z-10 bg-black">
 					<svg width={margin.left} {height} class="font-sans">
 						<g transform="translate({margin.left}, {margin.top})">
 							{#each activities as act, row}
@@ -220,18 +220,33 @@
 				<h3 class="mb-4 font-serif text-2xl font-bold text-gray-200">Activities that improve mood</h3>
 				<div class="space-y-3">
 					{#each topActivities as activity, i}
-						<div class="rounded-lg border border-gray-700 bg-gray-800/50 p-3 transition-colors hover:border-yellow-500/30">
-							<div class="mb-2 flex items-center justify-between">
-								<span class="text-lg font-bold text-white">
+						<div class="rounded-lg border border-yellow-500/30 p-4 transition-colors">
+							<div class="mb-3 flex items-center justify-between">
+								<span class="font-serif text-lg font-bold text-white">
 									<span class="mr-2 text-gray-500">#{i + 1}</span>{activity.name}
 								</span>
-								<span class="font-mono text-sm font-bold text-green-400">{Math.round(activity.score)}% positive</span>
+								<span class="text-md font-serif font-bold text-gray-500">{Math.round(activity.score)}% positive</span>
 							</div>
-							<div class="flex h-2 w-full overflow-hidden rounded-full bg-gray-700">
-								<div style="width: {(activity.breakdown.Happy / activity.total) * 100}%" class="bg-[#FFD700]"></div>
-								<div style="width: {(activity.breakdown.Pleased / activity.total) * 100}%" class="bg-[#32CD32]"></div>
-								<div style="width: {(activity.breakdown.Displeased / activity.total) * 100}%" class="bg-[#FF4500]"></div>
-								<div style="width: {(activity.breakdown.Sad / activity.total) * 100}%" class="bg-[#1E90FF]"></div>
+
+							<div class="flex h-3 w-full gap-0.5 overflow-hidden rounded-full">
+								{#each [{ key: "Happy", color: "#ffda03" }, { key: "Pleased", color: "#83f28f" }, { key: "Displeased", color: "#ffa500" }, { key: "Sad", color: "#90d5ff" }] as seg}
+									{@const pct = activity.total > 0 ? (activity.breakdown[seg.key] / activity.total) * 100 : 0}
+									{#if pct > 0}
+										<div class="h-full transition-all duration-500" style="width: {pct}%; background: {seg.color};" title="{seg.key}: {Math.round(pct)}%"></div>
+									{/if}
+								{/each}
+							</div>
+							<div class="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+								{#each [{ key: "Happy", color: "#ffda03" }, { key: "Pleased", color: "#83f28f" }, { key: "Displeased", color: "#ffa500" }, { key: "Sad", color: "#90d5ff" }] as seg}
+									{@const pct = activity.total > 0 ? (activity.breakdown[seg.key] / activity.total) * 100 : 0}
+									{#if pct > 0}
+										<span class="flex items-center gap-1 text-xs text-gray-400">
+											<span class="inline-block h-2 w-2 rounded-full" style="background:{seg.color}"></span>
+											{seg.key}
+											{Math.round(pct)}%
+										</span>
+									{/if}
+								{/each}
 							</div>
 						</div>
 					{/each}
@@ -241,35 +256,35 @@
 	{/if}
 
 	{#if hovered}
-		<div class="fixed right-4 bottom-28 left-4 z-50 rounded border border-gray-700 bg-gray-800 p-3 shadow-lg md:right-4 md:left-auto md:w-64">
-			<div class="font-bold">{hovered.activity}</div>
-			<div class="flex items-center gap-2 text-sm text-gray-300">
+		<div class="fixed right-4 bottom-28 left-4 z-50 rounded border border-yellow-500/30 bg-[#1c1c1e]/60 p-3 shadow-lg md:right-4 md:left-auto md:w-64">
+			<div class="font-serif text-2xl font-bold">{hovered.activity}</div>
+			<div class="flex items-center gap-2 text-lg" style="color: {hovered.color}">
 				<span class="block h-3 w-3 rounded-full" style="background-color: {hovered.color}"></span>
 				{hovered.emotion}
 			</div>
-			<div class="mt-1 text-xs text-gray-400">Frequency: {hovered.frequency}</div>
+			<div class="mt-1 text-sm text-white">Frequency: {hovered.frequency}</div>
 		</div>
 	{:else if hoveredActivity}
-		<div class="fixed right-4 bottom-28 left-4 z-50 rounded border border-gray-700 bg-gray-800 p-4 shadow-lg md:right-4 md:left-auto md:w-64">
-			<div class="mb-2 flex justify-between border-b border-gray-700 pb-2 text-lg font-bold text-white">
+		<div class="fixed right-4 bottom-28 left-4 z-50 rounded border border-yellow-500/30 bg-[#1c1c1e]/60 p-4 shadow-lg md:right-4 md:left-auto md:w-64">
+			<div class="mb-2 flex justify-between pb-2 font-serif text-2xl font-bold text-white">
 				<span>{hoveredActivity.activity}</span>
 			</div>
 
-			<div class="mb-2 flex gap-2 font-mono text-xs tracking-wide uppercase">
+			<div class="mb-2 flex gap-2 font-mono text-sm tracking-wide uppercase">
 				<span class="text-green-400">{hoveredActivity.positivePercentage}% Pos</span>
 				<span class="text-gray-500">|</span>
 				<span class="text-red-400">{hoveredActivity.negativePercentage}% Neg</span>
 			</div>
 
 			<div class="mb-3">
-				<div class="text-xs tracking-wide text-gray-400 uppercase">Most common mood</div>
-				<div class="text-xl font-semibold text-white capitalize">{hoveredActivity.mostCommon}</div>
+				<div class="text-md text-center font-serif tracking-wide text-gray-400">Your most common mood</div>
+				<div class="text-center font-serif text-xl font-semibold text-white capitalize">{hoveredActivity.mostCommon}</div>
 			</div>
 
 			<div>
-				<div class="mb-1 text-xs tracking-wide text-gray-400 uppercase">Distribution</div>
+				<div class="text-md mb-1 font-serif tracking-wide text-gray-400">Distribution</div>
 				{#each hoveredActivity.distribution as item}
-					<div class="flex items-center justify-between py-0.5 text-sm">
+					<div class="text-md flex items-center justify-between py-0.5 font-serif">
 						<div class="flex items-center gap-2">
 							<span class="block h-2.5 w-2.5 rounded-full" style="background-color: {item.color}"></span>
 							<span class="text-gray-300 capitalize">{item.label}</span>

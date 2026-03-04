@@ -303,7 +303,7 @@
 
 	<div class="pointer-events-none absolute right-0 bottom-0 left-0 z-20 h-24 w-full bg-gradient-to-t from-black/95 from-65% to-transparent to-100%">
 		<div class="pointer-events-auto h-full w-full">
-			<Navigation {goto} />
+			<Navigation {goto} active="visual" />
 		</div>
 	</div>
 </div>

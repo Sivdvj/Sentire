@@ -23,21 +23,17 @@
 	let hovered = null;
 	let hoveredActivity = null;
 
-	const high_energy_unpleasant = ["angry", "annoyed", "frustrated", "irritated", "furious", "enraged", "outraged", "bitter", "resentful", "hostile", "aggressive", "violent", "impatient", "stressed", "anxious", "panicked", "terrified", "horrified", "disgusted", "repulsed", "nauseated", "appalled", "shocked", "dismayed", "alarmed", "distressed", "troubled", "worried", "uneasy", "restless", "agitated", "jittery", "nervous", "tense", "edgy", "on edge"];
+	function getCategory(color) {
+		if (!color) return { label: "Unknown", color: "#888888" };
+		const hex = color.replace("#", "");
+		const r = parseInt(hex.substring(0, 2), 16);
+		const g = parseInt(hex.substring(2, 4), 16);
+		const b = parseInt(hex.substring(4, 6), 16);
 
-	const high_energy_pleasant = ["happy", "ecstatic", "joyful", "delighted", "thrilled", "excited", "enthusiastic", "euphoric", "elated", "exuberant", "cheerful", "gleeful", "jubilant", "lively", "energetic", "vibrant", "animated", "spirited", "buoyant", "carefree", "lighthearted", "merry", "playful", "fun-loving", "optimistic", "hopeful", "confident", "proud", "accomplished", "triumphant", "victorious", "successful", "admired", "respected", "loved", "adored"];
-
-	const low_energy_unpleasant = ["sad", "depressed", "gloomy", "melancholic", "sorrowful", "mournful", "heartbroken", "desolate", "lonely", "isolated", "abandoned", "rejected", "disappointed", "discouraged", "hopeless", "despairing", "defeated", "weary", "exhausted", "drained", "lethargic", "sluggish", "apathetic", "indifferent", "numb", "detached", "alienated", "bored", "jaded", "unmotivated", "uninspired", "listless", "passive", "submissive", "resigned", "fatigued"];
-
-	const low_energy_pleasant = ["calm", "relaxed", "peaceful", "serene", "tranquil", "content", "satisfied", "fulfilled", "grateful", "appreciative", "loving", "affectionate", "caring", "empathetic", "aware", "patient", "tolerant", "accepting", "forgiving", "merciful", "gentle", "kind", "warm", "nurturing", "supportive", "encouraging", "reassuring", "comforting", "soothing", "mellow", "easygoing", "laid-back", "chill", "composed", "balanced", "harmonious"];
-
-	function getCategory(emotion) {
-		const norm = emotion.toLowerCase().trim();
-		if (high_energy_pleasant.includes(norm)) return { label: "Happy", color: "#FFD700" }; // Yellow/Gold
-		if (low_energy_pleasant.includes(norm)) return { label: "Pleased", color: "#32CD32" }; // LimeGreen
-		if (high_energy_unpleasant.includes(norm)) return { label: "Displeased", color: "#FF4500" }; // OrangeRed
-		if (low_energy_unpleasant.includes(norm)) return { label: "Sad", color: "#1E90FF" }; // DodgerBlue
-		return { label: "Unknown", color: "#888888" };
+		if (b > r && b > g * 0.8) return { label: "Sad", color: "#1E90FF" }; // Blue
+		if (g > r && g > b) return { label: "Pleased", color: "#32CD32" }; // Green
+		if (g > r * 0.75) return { label: "Happy", color: "#FFD700" }; // Yellow
+		return { label: "Displeased", color: "#FF4500" }; // Red
 	}
 
 	function getActivityStats(activity) {
@@ -60,7 +56,7 @@
 		};
 
 		activityData.forEach((d) => {
-			const cat = getCategory(d.emotion).label;
+			const cat = getCategory(d.color).label;
 			counts[cat] = (counts[cat] || 0) + d.frequency;
 		});
 

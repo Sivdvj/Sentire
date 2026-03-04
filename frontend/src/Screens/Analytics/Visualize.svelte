@@ -3,7 +3,7 @@
 	import Icons from "../../lib/Icons.svelte";
 	import Navigation from "../../lib/Navigation.svelte";
 	import { request } from "../../lib/Auth";
-
+	import ThreeParticles from "../../lib/ThreeParticles.svelte";
 	export let goto;
 
 	let data = [];
@@ -167,97 +167,102 @@
 </script>
 
 <!-- TODO: improve UI -->
-<div class="scrollbar-hide h-full w-full overflow-y-auto scroll-smooth p-4 pb-32 text-white">
-	<h2 class="mb-4 font-serif text-4xl font-bold">Activity & Emotion</h2>
+<div class="relative h-full w-full overflow-hidden">
+	<div class="pointer-events-none absolute inset-0 z-0 opacity-60 blur-md">
+		<ThreeParticles colorParticles={"#ffa500"} />
+	</div>
+	<div class="scrollbar-hide relative z-10 h-full w-full overflow-y-auto scroll-smooth pb-32 text-white">
+		<h2 class="mb-4 px-4 pt-4 font-serif text-4xl font-bold">Activity & Emotion</h2>
 
-	{#if loading}
-		<div class="flex items-center justify-center p-10">Loading...</div>
-	{:else if error}
-		<div class="p-10 text-red-400">{error}</div>
-	{:else if data.length === 0}
-		<div class="p-10 text-gray-400">No activity data yet.</div>
-	{:else}
-		<div class="scrollbar-hide overflow-x-auto">
-			<div class="flex min-w-max">
-				<div class="sticky left-0 z-10 bg-black">
-					<svg width={margin.left} {height} class="font-sans">
-						<g transform="translate({margin.left}, {margin.top})">
-							{#each activities as act, row}
-								<text x="-10" y={row * cellSize + cellSize / 2} dy="0.35em" text-anchor="end" fill={hoveredActivity?.activity === act ? "white" : "#ddd"} font-weight={hoveredActivity?.activity === act ? "bold" : "normal"} font-size="13" class="cursor-pointer transition-colors duration-200" on:mouseenter={() => (hoveredActivity = getActivityStats(act))} on:mouseleave={() => (hoveredActivity = null)}>
-									{act}
-								</text>
-							{/each}
-						</g>
-					</svg>
-				</div>
+		{#if loading}
+			<div class="flex items-center justify-center p-10">Loading...</div>
+		{:else if error}
+			<div class="p-10 text-red-400">{error}</div>
+		{:else if data.length === 0}
+			<div class="p-10 text-gray-400">No activity data yet.</div>
+		{:else}
+			<div class="scrollbar-hide overflow-x-auto">
+				<div class="flex min-w-max">
+					<div class="sticky left-0 z-10 bg-black">
+						<svg width={margin.left} {height} class="font-sans">
+							<g transform="translate({margin.left}, {margin.top})">
+								{#each activities as act, row}
+									<text x="-10" y={row * cellSize + cellSize / 2} dy="0.35em" text-anchor="end" fill={hoveredActivity?.activity === act ? "white" : "#ddd"} font-weight={hoveredActivity?.activity === act ? "bold" : "normal"} font-size="13" class="cursor-pointer transition-colors duration-200" on:mouseenter={() => (hoveredActivity = getActivityStats(act))} on:mouseleave={() => (hoveredActivity = null)}>
+										{act}
+									</text>
+								{/each}
+							</g>
+						</svg>
+					</div>
 
-				<div>
-					<svg width={width - margin.left} {height} class="font-sans">
-						<g transform="translate(0, {margin.top})">
-							{#each emotions as emo, col}
-								<text x={col * cellSize + cellSize / 2} y="-10" text-anchor="start" fill="#aaa" font-size="12" transform={`rotate(-45, ${col * cellSize + cellSize / 2}, -10)`}>
-									{emo}
-								</text>
-							{/each}
-
-							{#each activities as act, row}
+					<div>
+						<svg width={width - margin.left} {height} class="font-sans">
+							<g transform="translate(0, {margin.top})">
 								{#each emotions as emo, col}
-									{@const cellData = getBubbleData(act, emo)}
-									<circle cx={col * cellSize + cellSize / 2} cy={row * cellSize + cellSize / 2} r="2" fill="#333" />
-									{#if cellData}
-										<circle cx={col * cellSize + cellSize / 2} cy={row * cellSize + cellSize / 2} r={(Math.sqrt(cellData.frequency) / Math.sqrt(maxFreq)) * (cellSize * 0.4)} fill={cellData.color || "white"} opacity={hovered === cellData ? 1 : 0.8} stroke={hovered === cellData ? "white" : "none"} stroke-width="2" class="cursor-pointer transition-all duration-200" on:mouseenter={() => (hovered = cellData)} on:mouseleave={() => (hovered = null)} />
-									{/if}
+									<text x={col * cellSize + cellSize / 2} y="-10" text-anchor="start" fill="#aaa" font-size="12" transform={`rotate(-45, ${col * cellSize + cellSize / 2}, -10)`}>
+										{emo}
+									</text>
 								{/each}
-							{/each}
-						</g>
-					</svg>
+
+								{#each activities as act, row}
+									{#each emotions as emo, col}
+										{@const cellData = getBubbleData(act, emo)}
+										<circle cx={col * cellSize + cellSize / 2} cy={row * cellSize + cellSize / 2} r="2" fill="#333" />
+										{#if cellData}
+											<circle cx={col * cellSize + cellSize / 2} cy={row * cellSize + cellSize / 2} r={(Math.sqrt(cellData.frequency) / Math.sqrt(maxFreq)) * (cellSize * 0.4)} fill={cellData.color || "white"} opacity={hovered === cellData ? 1 : 0.8} stroke={hovered === cellData ? "white" : "none"} stroke-width="2" class="cursor-pointer transition-all duration-200" on:mouseenter={() => (hovered = cellData)} on:mouseleave={() => (hovered = null)} />
+										{/if}
+									{/each}
+								{/each}
+							</g>
+						</svg>
+					</div>
 				</div>
 			</div>
-		</div>
 
-		{#if topActivities.length > 0}
-			<div class="mt-8 mb-6">
-				<h3 class="mb-4 font-serif text-2xl font-bold text-gray-200">Activities that improve mood</h3>
-				<div class="space-y-3">
-					{#each topActivities as activity, i}
-						<div class="rounded-lg border border-yellow-500/30 p-4 transition-colors">
-							<div class="mb-3 flex items-center justify-between">
-								<span class="font-serif text-lg font-bold text-white">
-									<span class="mr-2 text-gray-500">#{i + 1}</span>{activity.name}
-								</span>
-								<span class="text-md font-serif font-bold text-gray-500">{Math.round(activity.score)}% positive</span>
-							</div>
+			{#if topActivities.length > 0}
+				<div class="mt-8 mb-6 px-4">
+					<h3 class="mb-4 font-serif text-2xl font-bold text-gray-200">Activities that improve mood</h3>
+					<div class="space-y-3">
+						{#each topActivities as activity, i}
+							<div class="rounded-lg border border-yellow-500/30 p-4 transition-colors">
+								<div class="mb-3 flex items-center justify-between">
+									<span class="font-serif text-lg font-bold text-white">
+										<span class="mr-2 text-gray-500">#{i + 1}</span>{activity.name}
+									</span>
+									<span class="text-md font-serif font-bold text-gray-500">{Math.round(activity.score)}% positive</span>
+								</div>
 
-							<div class="flex h-3 w-full gap-0.5 overflow-hidden rounded-full">
-								{#each [{ key: "Happy", color: "#ffda03" }, { key: "Pleased", color: "#83f28f" }, { key: "Displeased", color: "#ffa500" }, { key: "Sad", color: "#90d5ff" }] as seg}
-									{@const pct = activity.total > 0 ? (activity.breakdown[seg.key] / activity.total) * 100 : 0}
-									{#if pct > 0}
-										<div class="h-full transition-all duration-500" style="width: {pct}%; background: {seg.color};" title="{seg.key}: {Math.round(pct)}%"></div>
-									{/if}
-								{/each}
+								<div class="flex h-3 w-full gap-0.5 overflow-hidden rounded-full">
+									{#each [{ key: "Happy", color: "#ffda03" }, { key: "Pleased", color: "#83f28f" }, { key: "Displeased", color: "#ffa500" }, { key: "Sad", color: "#90d5ff" }] as seg}
+										{@const pct = activity.total > 0 ? (activity.breakdown[seg.key] / activity.total) * 100 : 0}
+										{#if pct > 0}
+											<div class="h-full transition-all duration-500" style="width: {pct}%; background: {seg.color};" title="{seg.key}: {Math.round(pct)}%"></div>
+										{/if}
+									{/each}
+								</div>
+								<div class="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+									{#each [{ key: "Happy", color: "#ffda03" }, { key: "Pleased", color: "#83f28f" }, { key: "Displeased", color: "#ffa500" }, { key: "Sad", color: "#90d5ff" }] as seg}
+										{@const pct = activity.total > 0 ? (activity.breakdown[seg.key] / activity.total) * 100 : 0}
+										{#if pct > 0}
+											<span class="flex items-center gap-1 text-xs text-gray-400">
+												<span class="inline-block h-2 w-2 rounded-full" style="background:{seg.color}"></span>
+												{seg.key}
+												{Math.round(pct)}%
+											</span>
+										{/if}
+									{/each}
+								</div>
 							</div>
-							<div class="mt-2 flex flex-wrap gap-x-3 gap-y-1">
-								{#each [{ key: "Happy", color: "#ffda03" }, { key: "Pleased", color: "#83f28f" }, { key: "Displeased", color: "#ffa500" }, { key: "Sad", color: "#90d5ff" }] as seg}
-									{@const pct = activity.total > 0 ? (activity.breakdown[seg.key] / activity.total) * 100 : 0}
-									{#if pct > 0}
-										<span class="flex items-center gap-1 text-xs text-gray-400">
-											<span class="inline-block h-2 w-2 rounded-full" style="background:{seg.color}"></span>
-											{seg.key}
-											{Math.round(pct)}%
-										</span>
-									{/if}
-								{/each}
-							</div>
-						</div>
-					{/each}
+						{/each}
+					</div>
 				</div>
-			</div>
+			{/if}
 		{/if}
-	{/if}
+	</div>
 
 	{#if hovered}
-		<div class="fixed right-4 bottom-28 left-4 z-50 rounded border border-yellow-500/30 bg-[#1c1c1e]/60 p-3 shadow-lg md:right-4 md:left-auto md:w-64">
-			<div class="font-serif text-2xl font-bold">{hovered.activity}</div>
+		<div class="absolute right-4 bottom-28 left-4 z-50 rounded border border-yellow-500/30 bg-[#1c1c1e]/95 p-3 shadow-lg md:right-4 md:left-auto md:w-64">
+			<div class="font-serif text-2xl font-bold text-white">{hovered.activity}</div>
 			<div class="flex items-center gap-2 text-lg" style="color: {hovered.color}">
 				<span class="block h-3 w-3 rounded-full" style="background-color: {hovered.color}"></span>
 				{hovered.emotion}
@@ -265,7 +270,7 @@
 			<div class="mt-1 text-sm text-white">Frequency: {hovered.frequency}</div>
 		</div>
 	{:else if hoveredActivity}
-		<div class="fixed right-4 bottom-28 left-4 z-50 rounded border border-yellow-500/30 bg-[#1c1c1e]/60 p-4 shadow-lg md:right-4 md:left-auto md:w-64">
+		<div class="absolute right-4 bottom-28 left-4 z-50 rounded border border-yellow-500/30 bg-[#1c1c1e]/95 p-4 shadow-lg md:right-4 md:left-auto md:w-64">
 			<div class="mb-2 flex justify-between pb-2 font-serif text-2xl font-bold text-white">
 				<span>{hoveredActivity.activity}</span>
 			</div>
@@ -296,7 +301,7 @@
 		</div>
 	{/if}
 
-	<div class="pointer-events-none fixed right-0 bottom-0 left-0 z-10 h-24 w-full bg-gradient-to-t from-black/95 from-65% to-transparent to-100% md:absolute">
+	<div class="pointer-events-none absolute right-0 bottom-0 left-0 z-20 h-24 w-full bg-gradient-to-t from-black/95 from-65% to-transparent to-100%">
 		<div class="pointer-events-auto h-full w-full">
 			<Navigation {goto} />
 		</div>

@@ -18,6 +18,8 @@ export default defineConfig({
 			"/sessions": "http://localhost:3000",
 			"/friend": "http://localhost:3000",
 			"/analytics": "http://localhost:3000",
+			"/get-activities": "http://localhost:3000",
+			"/add-activity": "http://localhost:3000",
 		},
 	},
 });

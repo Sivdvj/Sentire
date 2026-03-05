@@ -30,15 +30,15 @@
 		</div>
 		<div class="flex flex-col">
 			<p class="text-white">Themes</p>
-			<YouFelt buttons={buttons1} />
+			<YouFelt buttons={buttons1} category="Themes" />
 		</div>
 		<div class="flex flex-col">
 			<p class="text-white">People</p>
-			<YouFelt buttons={buttons2} />
+			<YouFelt buttons={buttons2} category="People" />
 		</div>
 		<div class="flex flex-col">
 			<p class="text-white">Places</p>
-			<YouFelt buttons={buttons3} />
+			<YouFelt buttons={buttons3} category="Places" />
 		</div>
 	</div>
 	<button class="fixed right-4 bottom-4 z-20 cursor-pointer md:absolute" on:click={() => goto("screen5")}>

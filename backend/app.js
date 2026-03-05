@@ -97,6 +97,18 @@ app.post("/save", async (req, res) => {
 	res.json({ ok: true });
 });
 
+app.post("/get-activities", async (req, res) => {
+	let activities = await db.getUserActivities(req.userID);
+	res.json({ activities });
+});
+
+app.post("/add-activity", async (req, res) => {
+	let { activity, category } = req.body;
+	if (!activity || !category) return res.status(400).json({ error: "Missing fields" });
+	await db.addUserActivity(req.userID, activity, category);
+	res.json({ ok: true });
+});
+
 app.post("/share", async (req, res) => {
 	let { Id, emo, color, text, act, viewers } = req.body;
 
@@ -201,6 +213,18 @@ app.post("/analytics/activity", async (req, res) => {
 			error: "Failed to load analytics",
 		});
 	}
+});
+
+app.post("/get-activities", async (req, res) => {
+	let activities = await db.getUserActivities(req.userID);
+	res.json({ activities });
+});
+
+app.post("/add-activity", async (req, res) => {
+	let { activity, category } = req.body;
+	if (!activity || !category) return res.status(400).json({ error: "Missing fields" });
+	await db.addUserActivity(req.userID, activity, category);
+	res.json({ ok: true });
 });
 
 app.listen(port, () => {

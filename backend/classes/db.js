@@ -15,4 +15,6 @@ export class DB {
 	async getSessions(userId, currentToken) {}
 	async revokeSession(userId, token) {}
 	async revokeAllSessions(userId, currentToken) {}
+	async getUserActivities(userId) {}
+	async addUserActivity(userId, activity, category) {}
 }

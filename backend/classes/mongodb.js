@@ -27,6 +27,21 @@ export class MongoDB extends DB {
 		return user.friendCode;
 	}
 
+	async getUserActivities(userId) {
+		return await this.db
+			.collection("user_activities")
+			.find({ userId: new ObjectId(userId) })
+			.toArray();
+	}
+
+	async addUserActivity(userId, activity, category) {
+		await this.db.collection("user_activities").insertOne({
+			userId: new ObjectId(userId),
+			activity,
+			category,
+		});
+	}
+
 	async createUser(username, password, firstname) {
 		let friendCode = crypto.randomBytes(4).toString("base64url").toUpperCase();
 

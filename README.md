@@ -1,8 +1,24 @@
 # Emotion Tracking Web Application
 
-A full-stack web application for tracking, storing, and managing user emotions securely over time.
+A full-stack web application for log & share emotions, track patterns over time, and analyze how activities influence mood securely over time.
 
-Built using **Svelte**, **Node.js (Express)**, and **PostgreSQL, deployed on Azure** with **Nginx** as a reverse proxy and **PM2** for process management.
+Built using **Svelte**, **Node.js (Express)**, and **MongoDB & Neo4j**, deployed using **Docker** and **Nginx**.
+
+---
+
+## Why
+
+The system tracks:
+
+> **What you do → How you feel**
+
+Over time, it identifies patterns like:
+
+- “Music improves mood”
+- “Studying is associated with stress”
+- “Gym correlates with positive emotions”
+
+This enables **data-driven self-awareness and behavioral insights**.
 
 ---
 
@@ -11,6 +27,9 @@ Built using **Svelte**, **Node.js (Express)**, and **PostgreSQL, deployed on Azu
 - User authentication
 - Session-based authentication
 - Emotion logging with color tagging
+- Activity-based emotion tracking
+- Social sharing with friends
+- Analytics - activity vs emotion patterns
 - Retrieve emotion history per user
 - Manage active sessions (view, revoke single session, revoke all)
 - Cross-origin support with secure CORS configuration
@@ -20,55 +39,31 @@ Built using **Svelte**, **Node.js (Express)**, and **PostgreSQL, deployed on Azu
 
 ## Architecture Overview
 
-![Architecture](design/architecture.png)
-![Architecture](design/architecture2.png)
-
----
-## Software Design
-
-- **Polymorphic Abstraction**: A class-based database layer allows the app to switch between PostgreSQL and MongoDB via `.env` configuration without changing the API logic.
-- **Layered N-Tier Architecture**: Clean separation between the Presentation (Svelte), Logic (Express Middleware), and Data Abstraction layers.
-- **Low Coupling**: The frontend and backend communicate strictly via a JSON API contract.
-- **Stateful Security**: Unlike stateless JWTs, database-backed sessions allow for Remote Session Revocation.
-
----
+## ![Architecture](arch/EmotionsTrackingApplication.png)
 
 ## Tech Stack
 
 - **Frontend**: Svelte + JavaScript
 - **Backend**: NodeJS + ExpressJS
-- **Database**: PostgreSQL
-- **Deployment & Infrastructure**: Azure VM - Nginx & PM2
+- **Database**: MongoDB + Neo4j
+- **Deployment & Infrastructure**: Docker + Nginx (reverse proxy)
 
 ---
 
-## Project Structure
+## Why Neo4j
 
-```
-├── backend/
-│   ├── app.js
-│   ├── classes/ 
-│   ├── Dockerfile
-│   ├── package.json
-│   └── package-lock.json
-├── design/
-│   ├── architecture2.png
-│   └── architecture.png
-├── frontend/
-│   ├── Dockerfile
-│   ├── index.html
-│   ├── jsconfig.json
-│   ├── nginx/
-│   ├── package.json
-│   ├── package-lock.json
-│   ├── public/                 
-│   ├── src/
-│   ├── svelte.config.js
-│   └── vite.config.js
-├── package.json
-├── docker-compose.yml
-└── README.md
-```
+In order to perform activity vs emotion frequency analysis, we need to perform multiple many to many relation queries. These queries are computationally expensive in MongoDB due to individual document retrieval. Neo4j models these relationships natively as a graph, enabling efficient traversal and faster relationship-based queries
+
+- Activity vs emotion frequency analysis
+- Mood pattern detection
+- Behavioral insights
+- Relationship traversal
+
+For example:
+
+- Gym → 80% positive emotions
+- Music → 90% positive emotions
+- Studying → mostly negative
 
 ---
 
@@ -78,8 +73,16 @@ Create a `.env` file in the backend root:
 
 ```env
 FRONTEND_URL=http://localhost:5173
-DATABASE_URL=postgresql://user:password@host:port/dbname
 MONGO_URL=mongodb://localhost:27017/dbname
+NEO4J_URL=neo4j://username:password@localhost:7687
+```
+
+---
+
+## Using Docker
+
+```
+docker compose up -d --build
 ```
 
 ---
@@ -107,44 +110,3 @@ http://localhost:3000
 npm install
 npm run dev
 ```
-
----
-
-## Authentication Flow
-
-1. User signs up → password hashed using bcrypt
-2. User logs in → credentials verified
-3. Server creates session token
-4. Token stored as HTTP-only cookie
-5. Protected routes validate session
-
----
-
-## API Endpoints
-
-| Endpoint     | Method | Description            |
-| ------------ | ------ | ---------------------- |
-| `/signin`    | POST   | Create user            |
-| `/login`     | POST   | Login user             |
-| `/save`      | POST   | Save emotion           |
-| `/data`      | POST   | Fetch emotions         |
-| `/logout`    | POST   | Logout current session |
-| `/sessions`  | POST   | View active sessions   |
-| `/revoke`    | POST   | Revoke one session     |
-| `/revokeAll` | POST   | Revoke all sessions    |
-
----
-
-## Security
-
-- Password hashing with bcrypt
-- HTTP-only cookies for sessions
-- CORS configured with credentials
-- Designed to support HTTPS with SSL/TLS via Nginx
-
----
-
-## Future Improvements
-
-- Emotion analytics & visualization
-- Neo4j for social emotion sharing graph

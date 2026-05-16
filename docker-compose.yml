@@ -62,6 +62,7 @@ services:
             - "traefik.http.routers.sentire.entrypoints=websecure"
             - "traefik.http.routers.sentire.tls.certresolver=letsencrypt"
             - "traefik.http.services.sentire.loadbalancer.server.port=80"
+            - "traefik.docker.network=traefik-net"
         restart: unless-stopped
 
 networks:

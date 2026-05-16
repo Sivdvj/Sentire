@@ -2,10 +2,10 @@ services:
     mongodb:
         image: mongo:7
         container_name: mongodb
-        # ports:
-        #   - "27017:27017"
         volumes:
             - mongo_data:/data/db
+        networks:
+            - sentire-internal
         restart: unless-stopped
 
     postgres:
@@ -15,10 +15,10 @@ services:
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres
             POSTGRES_DB: postgres
-        # ports:
-        #   - "5432:5432"
         volumes:
             - pg_data:/var/lib/postgresql
+        networks:
+            - sentire-internal
         restart: unless-stopped
 
     neo4j:
@@ -31,33 +31,44 @@ services:
         volumes:
             - neo4j_data:/data
             - neo4j_logs:/logs
+        networks:
+            - sentire-internal
         restart: unless-stopped
 
     backend:
         build: ./backend
-        container_name: backend
-        ports:
-            - "3000:3000"
+        container_name: sentire-backend
         env_file:
             - ./backend/.env
         depends_on:
             - mongodb
             - postgres
             - neo4j
+        networks:
+            - sentire-internal
         restart: unless-stopped
 
     frontend:
         build: ./frontend
-        container_name: frontend
-        ports:
-            - "80:80"
-            - "443:443"
-        volumes:
-            - /etc/letsencrypt/live/sivv.me/fullchain.pem:/etc/ssl/certs/fullchain.pem
-            - /etc/letsencrypt/live/sivv.me/privkey.pem:/etc/ssl/private/privkey.pem
+        container_name: sentire-frontend
         depends_on:
             - backend
+        networks:
+            - traefik-net
+            - sentire-internal
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.sentire.rule=Host(`sentire.sivv.me`)"
+            - "traefik.http.routers.sentire.entrypoints=websecure"
+            - "traefik.http.routers.sentire.tls.certresolver=letsencrypt"
+            - "traefik.http.services.sentire.loadbalancer.server.port=80"
         restart: unless-stopped
+
+networks:
+    traefik-net:
+        external: true
+    sentire-internal:
+        driver: bridge
 
 volumes:
     mongo_data:
